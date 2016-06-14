@@ -62,6 +62,12 @@ with tf.Session() as sess:
 
     print "Optimization Finished!"
 
+    # test model
+    correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y,1))
+    # Calculate accuracy
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+    print "Accuracy : ", accuracy.eval({x:mnist.test.images, y:mnist.test.labels})
+
     # Get one and predict
     r = random.randint(0, mnist.test.num_examples -1 )
     print "Label : ", sess.run( tf.argmax(mnist.test.labels[r:r+1], 1))
