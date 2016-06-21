@@ -65,23 +65,45 @@ train_op = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(cost)
 predict_op = tf.argmax(py_x, 1)
 
 # Launch the graph in a session
+# with tf.Session() as sess:
+#     # you need to initialize all variables
+#     tf.initialize_all_variables().run()
+#
+#     for i in range(100):
+#         training_batch = zip(range(0, len(trX), batch_size),
+#                              range(batch_size, len(trX), batch_size))
+#         for start, end in training_batch:
+#             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end],
+#                                           p_keep_conv: 0.8, p_keep_hidden: 0.5})
+#
+#         test_indices = np.arange(len(teX)) # Get A Test Batch
+#         np.random.shuffle(test_indices)
+#         test_indices = test_indices[0:test_size]
+#
+#         print(i, np.mean(np.argmax(teY[test_indices], axis=1) ==
+#                          sess.run(predict_op, feed_dict={X: teX[test_indices],
+#                                                          Y: teY[test_indices],
+#                                                          p_keep_conv: 1.0,
+#                                                          p_keep_hidden: 1.0})))
+
+
+
 with tf.Session() as sess:
     # you need to initialize all variables
     tf.initialize_all_variables().run()
 
-    for i in range(100):
+    for i in range(2):
         training_batch = zip(range(0, len(trX), batch_size),
                              range(batch_size, len(trX), batch_size))
         for start, end in training_batch:
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end],
                                           p_keep_conv: 0.8, p_keep_hidden: 0.5})
+        print "step : ", i
 
-        test_indices = np.arange(len(teX)) # Get A Test Batch
-        np.random.shuffle(test_indices)
-        test_indices = test_indices[0:test_size]
+    print "Optimization Finished!"
 
-        print(i, np.mean(np.argmax(teY[test_indices], axis=1) ==
-                         sess.run(predict_op, feed_dict={X: teX[test_indices],
-                                                         Y: teY[test_indices],
-                                                         p_keep_conv: 1.0,
-                                                         p_keep_hidden: 1.0})))
+    # Test model
+    correct_prediction = tf.equal(predict_op, tf.argmax(teY, 1))
+    # Calculate accuracy
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    print "Accuracy:", accuracy.eval({X: teX, Y: teY, p_keep_conv: 1.0, p_keep_hidden: 1.0 })
